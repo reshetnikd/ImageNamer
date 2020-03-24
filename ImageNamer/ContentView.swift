@@ -16,12 +16,14 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List(images, id: \.name) { imported in
-                HStack {
-                    Image(uiImage: imported.image)
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                    
-                    Text(imported.name)
+                NavigationLink(destination: DetailView(title: imported.name, image: Image(uiImage: imported.image))) {
+                    HStack {
+                        Image(uiImage: imported.image)
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                        
+                        Text(imported.name)
+                    }
                 }
             }
             .navigationBarTitle("Images")
