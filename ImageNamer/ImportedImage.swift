@@ -8,12 +8,26 @@
 
 import UIKit
 
-struct ImportedImage: Comparable {
+struct ImportedImage: Comparable, Codable {
     var name: String
     var image: UIImage
     
     static func < (lhs: ImportedImage, rhs: ImportedImage) -> Bool {
         lhs.name < rhs.name
     }
+}
 
+public protocol ImageCodable: Codable {}
+
+extension UIImage: ImageCodable {}
+
+extension ImageCodable where Self: UIImage {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.init(data: try container.decode(Data.self))!
+    }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.jpegData(compressionQuality: 0.8)!)
+    }
 }

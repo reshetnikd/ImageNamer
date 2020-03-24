@@ -32,16 +32,40 @@ struct ContentView: View {
                     Image(systemName: "plus")
                 }
             )
-            .sheet(isPresented: $showingImagePicker, onDismiss: addImage) {
+            .sheet(isPresented: $showingImagePicker, onDismiss: saveData) {
                 ImagePicker(image: self.$inputImage)
             }
+            .onAppear(perform: loadData)
         }
     }
     
-    func addImage() {
-        guard let inputImage = inputImage else { return }
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
+    
+    func loadData() {
+        let filename = getDocumentsDirectory().appendingPathComponent("SavedPlaces")
         
-        images.append(ImportedImage(name: "test", image: inputImage))
+        do {
+            let data = try Data(contentsOf: filename)
+            images = try JSONDecoder().decode([ImportedImage].self, from: data)
+        } catch {
+            print("Unable to load saved data.")
+            debugPrint(error)
+        }
+    }
+    
+    func saveData() {
+        guard let inputImage = inputImage else { return }
+        images.append(ImportedImage(name: UUID().uuidString, image: inputImage))
+        do {
+            let filename = getDocumentsDirectory().appendingPathComponent("SavedPlaces")
+            let data = try JSONEncoder().encode(self.images)
+            try data.write(to: filename, options: [.atomicWrite, .completeFileProtection])
+        } catch {
+            print("Unable to save data.")
+        }
     }
 }
 
