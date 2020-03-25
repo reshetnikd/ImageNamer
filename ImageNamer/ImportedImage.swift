@@ -7,10 +7,13 @@
 //
 
 import UIKit
+import CoreLocation
 
 struct ImportedImage: Comparable, Codable {
     var name: String
     var image: UIImage
+    var latitude: CLLocationDegrees
+    var longitude: CLLocationDegrees
     
     static func < (lhs: ImportedImage, rhs: ImportedImage) -> Bool {
         lhs.name < rhs.name

@@ -13,10 +13,12 @@ struct ContentView: View {
     @State private var inputImage: UIImage?
     @State private var showingImagePicker = false
     
+    let locationFetcher = LocationFetcher()
+    
     var body: some View {
         NavigationView {
             List(images, id: \.name) { imported in
-                NavigationLink(destination: DetailView(title: imported.name, image: Image(uiImage: imported.image))) {
+                NavigationLink(destination: DetailView(imported: imported)) {
                     HStack {
                         Image(uiImage: imported.image)
                             .resizable()
@@ -47,6 +49,7 @@ struct ContentView: View {
     }
     
     func loadData() {
+        self.locationFetcher.start()
         let filename = getDocumentsDirectory().appendingPathComponent("SavedPlaces")
         
         do {
@@ -60,7 +63,8 @@ struct ContentView: View {
     
     func saveData() {
         guard let inputImage = inputImage else { return }
-        images.append(ImportedImage(name: UUID().uuidString, image: inputImage))
+        let coordinate = locationFetcher.lastKnownLocation!
+        images.append(ImportedImage(name: UUID().uuidString, image: inputImage, latitude: coordinate.latitude, longitude: coordinate.longitude))
         do {
             let filename = getDocumentsDirectory().appendingPathComponent("SavedPlaces")
             let data = try JSONEncoder().encode(self.images)

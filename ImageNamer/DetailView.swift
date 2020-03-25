@@ -7,18 +7,22 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct DetailView: View {
-    var title: String
-    var image: Image
+    var imported: ImportedImage
     
     var body: some View {
         GeometryReader { geometry in
-            self.image
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: geometry.size.width)
+            VStack {
+                Image(uiImage: self.imported.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: geometry.size.width)
+                
+                MapView(centerCoordinate: CLLocationCoordinate2D(latitude: self.imported.latitude, longitude: self.imported.longitude))
+            }
         }
-        .navigationBarTitle(title)
+        .navigationBarTitle(imported.name)
     }
 }
